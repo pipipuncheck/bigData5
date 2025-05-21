@@ -1,0 +1,63 @@
+{
+  "type": "record",
+  "name": "sales_record",
+  "fields": [
+    { "name": "id", "type": "int" },
+    { "name": "customer_first_name", "type": "string" },
+    { "name": "customer_last_name", "type": "string" },
+    { "name": "customer_age", "type": "int" },
+    { "name": "customer_email", "type": "string" },
+    { "name": "customer_country", "type": "string" },
+    { "name": "customer_postal_code", "type": ["null", "string"] },
+    { "name": "customer_pet_type", "type": "string" },
+    { "name": "customer_pet_name", "type": "string" },
+    { "name": "customer_pet_breed", "type": "string" },
+
+    { "name": "seller_first_name", "type": "string" },
+    { "name": "seller_last_name", "type": "string" },
+    { "name": "seller_email", "type": "string" },
+    { "name": "seller_country", "type": "string" },
+    { "name": "seller_postal_code", "type": ["null", "string"] },
+
+    { "name": "product_name", "type": "string" },
+    { "name": "product_category", "type": "string" },
+    { "name": "product_price", "type": "double" },
+    { "name": "product_quantity", "type": "int" },
+
+    { "name": "sale_date", "type": "string" },
+    { "name": "sale_customer_id", "type": "int" },
+    { "name": "sale_seller_id", "type": "int" },
+    { "name": "sale_product_id", "type": "int" },
+    { "name": "sale_quantity", "type": "int" },
+    { "name": "sale_total_price", "type": "double" },
+
+    { "name": "store_name", "type": "string" },
+    { "name": "store_location", "type": "string" },
+    { "name": "store_city", "type": "string" },
+    { "name": "store_state", "type": ["null", "string"] },
+    { "name": "store_country", "type": "string" },
+    { "name": "store_phone", "type": "string" },
+    { "name": "store_email", "type": "string" },
+
+    { "name": "pet_category", "type": "string" },
+    { "name": "product_weight", "type": "double" },
+    { "name": "product_color", "type": "string" },
+    { "name": "product_size", "type": "string" },
+    { "name": "product_brand", "type": "string" },
+    { "name": "product_material", "type": "string" },
+    { "name": "product_description", "type": "string" },
+
+    { "name": "product_rating", "type": "double" },
+    { "name": "product_reviews", "type": "int" },
+    { "name": "product_release_date", "type": "string" },
+    { "name": "product_expiry_date", "type": "string" },
+
+    { "name": "supplier_name", "type": "string" },
+    { "name": "supplier_contact", "type": "string" },
+    { "name": "supplier_email", "type": "string" },
+    { "name": "supplier_phone", "type": "string" },
+    { "name": "supplier_address", "type": "string" },
+    { "name": "supplier_city", "type": "string" },
+    { "name": "supplier_country", "type": "string" }
+  ]
+}

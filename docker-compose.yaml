@@ -1,0 +1,99 @@
+version: "3"
+services:
+  nifi:
+    image: apache/nifi:1.10.0
+    container_name: nifi
+    restart: unless-stopped
+    user: root
+    ports:
+      - 8080:8080/tcp
+      - 8443:8443/tcp
+      - 10000:10000/tcp
+      - 8000:8000/tcp
+    volumes:
+      - /var/lib/nifi/database_repository:/opt/nifi/nifi-current/database_repository
+      - /var/lib/nifi/flowfile_repository:/opt/nifi/nifi-current/flowfile_repository
+      - /var/lib/nifi/content_repository:/opt/nifi/nifi-current/content_repository
+      - /var/lib/nifi/provenance_repository:/opt/nifi/nifi-current/provenance_repository
+      - /var/lib/nifi/state:/opt/nifi/nifi-current/state
+      - /var/lib/nifi/logs:/opt/nifi/nifi-current/logs
+      - ./initial_data:/opt/nifi/initial_data
+      - ./drivers/postgresql-42.7.2.jar:/opt/nifi/nifi-current/lib/postgresql-42.7.3.jar
+    environment:
+      NIFI_WEB_HTTP_HOST: "0.0.0.0"
+      NIFI_WEB_HTTP_PORT: 8080
+    command: >
+      bash -c "
+        chown -R 1000:1000 /opt/nifi/nifi-current &&
+        su -s /bin/bash -c '/opt/nifi/bin/nifi.sh run' nifi"
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper_lab4
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2188:2181"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka_lab4
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - 29092:29092
+    hostname: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "toxis:1:1"
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "29092"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  postgres:
+    image: postgres:13.3-alpine
+    container_name: postgres_lab44
+    restart: unless-stopped
+    ports:
+      - "5438:5432"
+    environment:
+      POSTGRES_DB: "db"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data
+      - ./dbroot:/root
+      - ./postgres/init-scripts:/docker-entrypoint-initdb.d
+  # metabase:
+  #   image: metabase/metabase:latest
+  #   container_name: metabase
+  #   hostname: metabase
+  #   ports:
+  #     - 3000:3000
+  #   environment:
+  #     MB_DB_TYPE: postgres
+  #     MB_DB_DBNAME: db
+  #     MB_DB_PORT: 5432
+  #     MB_DB_USER: user
+  #     MB_DB_PASS: password
+  #     MB_DB_HOST: postgres
+  #   healthcheck:
+  #     test: curl --fail -I http://localhost:3000/api/health || exit 1
+  #     interval: 15s
+  #     timeout: 5s
+  #     retries: 5
